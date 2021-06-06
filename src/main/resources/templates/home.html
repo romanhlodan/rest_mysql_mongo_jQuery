@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div>
+    <input type="text" id="name" placeholder="name">
+    <input type="text" id="surname" placeholder="surname">
+    <input type="number" id="age" placeholder="age">
+    <button id="save">save</button>
+</div>
+
+<h2>User save from MySQL</h2>
+<div class="target"> </div>
+<hr>
+<div>
+    <h2>Save to Mongo DB</h2>
+    <form action="/saveP" method="post">
+        <input type="text" name="name" placeholder="name">
+        <input type="text" name="surname" placeholder="surname">
+        <input type="number" name="age" placeholder="age">
+        <input type="submit">
+    </form>
+</div>
+<div>
+    <h2>User save from Mongo</h2>
+    <div th:each="person:${persons}">
+        <b>ID: <em th:text="${person._id}"></em></b>
+        <b>Name: <em th:text="${person.name}"></em></b>
+        <b>Surname: <em th:text="${person.surname}"></em></b>
+        <b>Age: <em th:text="${person.age}"></em></b>
+    </div>
+</div>
+
+<script>
+    let $target = $('.target');
+    let $pers = $('.pers');
+    let $id = $("#id");
+    let $save = $("#save")
+        .css({
+            background: 'orange',
+            width: 100,
+            height: 30,
+            textAlign: 'center'
+        });
+
+
+    $save.click(function () {
+        $target.empty();
+        $pers.empty();
+        let $inp_name = $('#name');
+        let name = $inp_name.val();
+        $inp_name.val('');
+        let $inp_surname = $('#surname');
+        let surname = $inp_surname.val();
+        $inp_surname.val('');
+        let $inp_age = $('#age');
+        let age = $inp_age.val();
+        $inp_age.val('');
+
+        let user = JSON.stringify({name, surname, age});
+
+        $.ajax({
+            url: 'http://localhost:8080/saveU',
+            type: 'PUT',
+            data: user,
+            contentType: 'application/json',
+            error: function (err) {
+                console.log(err);
+            },
+            success: function (result) {
+                $(result).each(function (index, obj) {
+                    let $b = $('<b>ID:</b>');
+                    let $em = $('<em/>',{text: obj.id});
+                    let $b1 = $('<b>Name:</b>');
+                    let $em1 = $('<em/>',{text: obj.name});
+                    let $b2 = $('<b>Surname:</b>');
+                    let $em2 = $('<em/>',{text: obj.surname});
+                    let $b3 = $('<b>Age:</b>');
+                    let $em3 = $('<em/>',{text: obj.age});
+                    let $br = $('<br>');
+                    // $pers.append($em,$em1,$em2,$em3);
+                    // $id.append($em,$em1,$em2,$em3);
+                    $target.append($b,$em,$b1,$em1,$b2,$em2,$b3,$em3,$br);
+
+                })
+            }
+        })
+    });
+</script>
+</body>
+</html>
